@@ -5,16 +5,16 @@ class Converter {
 		return Converter;
 	};
 
-	static set(key, value) {
-		BallpenPluginCookie.core(this.converter, key, value);
+	static set(key, value, attributes = {}) {
+		BallpenPluginCookie.core(this.converter, key, value, attributes);
 	};
 
 	static get(key) {
-		BallpenPluginCookie.core.call(BallpenPluginCookie.core, this.converter,  key);
+		BallpenPluginCookie.core.call(BallpenPluginCookie.core, this.converter, key);
 	};
 
-	static remove(key, attributes) {
-		BallpenPluginCookie.core(this.converter, key, '', BallpenPluginCookie.extend(attributes, {
+	static remove(key, attributes = {}) {
+		BallpenPluginCookie.core(this.converter, key, 'null', BallpenPluginCookie.extend(attributes, {
 			expires: -1
 		}));
 	};
@@ -37,21 +37,25 @@ class BallpenPluginCookie {
 		return Converter.init(converter);
 	};
 
-	static core(converter = {}, key, value, attributes) {
+	static core(converter = false, key, value, attributes) {
 		var result;
+		var optoString = Object.prototype.toString;
+
 		if (typeof document === 'undefined') {
 			return;
 		}
 
 		// Write
 		if (value) {
+			// Merge attributes
 			attributes = BallpenPluginCookie.extend({
 				path: '/'
-			}, {}, attributes);
+			}, attributes);
 
 			if (typeof attributes.expires === 'number') {
 				var expires = new Date();
-				expires.setMilliseconds(expires.getMilliseconds() + attributes.expires * 864e+5);
+				// By seconds
+				expires.setMilliseconds(expires.getMilliseconds() + (attributes.expires / (60 * 60 * 24))  * 864e+5);
 				attributes.expires = expires;
 			}
 
@@ -59,15 +63,16 @@ class BallpenPluginCookie {
 			attributes.expires = attributes.expires ? attributes.expires.toUTCString() : '';
 
 			try {
-				result = JSON.stringify(value);
-				if (/^[{[]/.test(result)) {
-					value = result;
+				if (optoString.call(value) === "[object Object]" || optoString.call(value) === "[object Array]") {
+					value = JSON.stringify(value);
 				}
 			} catch (e) {}
-
-			if (!converter.write) {
+			
+			if (!converter && !converter.write) {
 				value = encodeURIComponent(String(value))
 					.replace(/%(23|24|26|2B|3A|3C|3E|3D|2F|3F|40|5B|5D|5E|60|7B|7D|7C)/g, decodeURIComponent);
+			} else if(!converter.write) {
+				value = converter(value, key);
 			} else {
 				value = converter.write(value, key);
 			}
@@ -101,7 +106,6 @@ class BallpenPluginCookie {
 		// in case there are no cookies at all. Also prevents odd result when
 		// calling "get()"
 		var cookies = document.cookie ? document.cookie.split('; ') : [];
-
 		var rdecode = /(%[0-9A-Z]{2})+/g;
 		var i = 0;
 
@@ -115,17 +119,21 @@ class BallpenPluginCookie {
 
 			try {
 				var name = parts[0].replace(rdecode, decodeURIComponent);
-				cookie = converter.read 
-					? converter.read(cookie, name) : converter(cookie, name) ||
-					cookie.replace(rdecode, decodeURIComponent);
 
-				if (this.json) {
-					try {
-						cookie = JSON.parse(cookie);
-					} catch (e) {}
+				if (converter) {
+					if (converter.read) {
+						cookie = converter.read(cookie, name);
+					} else {
+						cookie = converter(cookie, name);	
+					}
+				} else {
+					cookie = cookie.replace(rdecode, decodeURIComponent);
 				}
-				console.log(key);
-				console.log(name);
+					
+				try {
+					cookie = JSON.parse(cookie);
+				} catch (e) {}
+		
 				if (key === name) {
 					result = cookie;
 					break;
@@ -140,16 +148,16 @@ class BallpenPluginCookie {
 		return result;
 	};
 
-	static set(key, value) {
-		BallpenPluginCookie.core({}, key, value);
+	static set(key, value, attributes = {}) {
+		BallpenPluginCookie.core(false, key, value, attributes);
 	};
 
 	static get(key) {
-		BallpenPluginCookie.core.call(BallpenPluginCookie.core, {}, key);
+		return BallpenPluginCookie.core.call(this, false, key);
 	};
 
-	static remove(key, attributes) {
-		BallpenPluginCookie.core({}, key, '', BallpenPluginCookie.extend(attributes, {
+	static remove(key, attributes = {}) {
+		BallpenPluginCookie.core(false, key, 'null', BallpenPluginCookie.extend(attributes, {
 			expires: -1
 		}));
 	};
