@@ -1,0 +1,48 @@
+{
+  "name": "ballpen-plugin-cookie",
+  "version": "0.1.0",
+  "description": "Ballpen.js build-in plugins collection.",
+  "main": "dist/ballpen-plugin-cookie.min.js",
+  "scripts": {
+    "dev": "rollup -c -w",
+    "dev-server": "browser-sync start --server --files 'dist/*.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Becavalier/ballpen-plugin-cookie.git"
+  },
+  "keywords": [
+    "ballpen",
+    "plugin",
+    "cookie"
+  ],
+  "author": "YHSPY",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Becavalier/ballpen-plugin-cookie/issues"
+  },
+  "homepage": "https://github.com/Becavalier/ballpen-plugin-cookie#readme",
+  "devDependencies": {
+    "babel-core": "^6.22.1",
+    "babel-eslint": "^7.1.1",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-stage-0": "^6.22.0",
+    "browser-sync": "^2.18.8",
+    "eslint": "^3.15.0",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-friendly-formatter": "^2.0.7",
+    "eslint-loader": "^1.6.1",
+    "eslint-plugin-html": "^2.0.0",
+    "eslint-plugin-promise": "^3.4.1",
+    "eslint-plugin-standard": "^2.0.1",
+    "rollup": "^0.41.4",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-commonjs": "^7.0.0",
+    "rollup-plugin-eslint": "^3.0.0",
+    "rollup-plugin-filesize": "^1.0.1",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "rollup-plugin-uglify": "^1.0.1",
+    "rollup-watch": "^3.2.2"
+  }
+}
